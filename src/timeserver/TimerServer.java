@@ -9,6 +9,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.sctp.nio.NioSctpServerChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import timeserver.handler.TimerServerHandler;
 
 public class TimerServer {
@@ -38,11 +40,13 @@ public class TimerServer {
 
         @Override
         protected void initChannel(SocketChannel socketChannel) throws Exception {
+            socketChannel.pipeline().addLast(new LineBasedFrameDecoder(1024));//遇到换行符结束
+            socketChannel.pipeline().addLast(new StringDecoder());// 自动把字节码装换为字符串
             socketChannel.pipeline().addLast(new TimerServerHandler());
         }
     }
 
     public static void main(String[] args) {
-        new TimerServer().bind(8080);
+        new TimerServer().bind(8082);
     }
 }

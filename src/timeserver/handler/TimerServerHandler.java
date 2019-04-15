@@ -10,14 +10,14 @@ import java.util.Date;
 
 
 public class TimerServerHandler extends ChannelHandlerAdapter {
+
+    private int counter;
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf buffer = (ByteBuf) msg;
-        byte[] req = new byte[buffer.readableBytes()];
-        buffer.readBytes(req);
-        String body = new String(req,"UTF-8");
+        String body = (String) msg;
         System.out.println("the time serverreceiver order : " + body);
-        String currentTime = "Query  timer order".concat(body).concat(new Date().toString());
+        String currentTime = "server response :".concat( ++ counter + "次：").concat(body).concat(System.getProperty("line.separator"));
+         currentTime = currentTime + System.getProperty("line.separator");
         ctx.write(Unpooled.copiedBuffer(currentTime.getBytes()));
     }
 

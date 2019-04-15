@@ -5,6 +5,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
 import timeserver.handler.TimerClientHandler;
 
 public class TimerClient {
@@ -19,6 +21,8 @@ public class TimerClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                            socketChannel.pipeline().addLast(new StringDecoder());
                             socketChannel.pipeline().addLast(new TimerClientHandler());
                         }
 
@@ -30,11 +34,13 @@ public class TimerClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
+            System.out.println("优雅关闭");
             eventLoopGroup.shutdownGracefully();
         }
     }
 
     public static void main(String[] args) {
-        new TimerClient().connect(8080,"127.0.0.1");
+       new TimerClient().connect(8082,"127.0.0.1");
+       //System.out.println(System.getProperty("line.separator"));
     }
 }
